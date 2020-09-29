@@ -88,7 +88,17 @@ function App() {
 
 
   }
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
+    console.log(user.email, user.password)
+    if(user.email && user.password){
+      firebase.auth().createUserWithEmailAndPassword(user.email, user.password).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+        // ...
+      });    }
+    event.preventDefault();
 
   }
 
@@ -100,7 +110,7 @@ function App() {
       }
       {
         user.isSignedIn && <div>
-          <p>Welcome, {user.name}</p>
+          <p>Welcome , {user.name}</p>
           <p>Welcome, {user.email}</p>
           <img src={user.photo} alt="" />
 
@@ -110,10 +120,9 @@ function App() {
 
       <h4> Our own Authentication system</h4>
 
-      <p>Name: {user.name} </p>
-      <p>Email: {user.email} </p>
+      
 
-      <p>password: {user.password} </p>
+
       <form onSubmit={handleSubmit}>
 
         <input name="name" onBlur={handleBlur}  placeholder="Enter your name" type="text"/>
