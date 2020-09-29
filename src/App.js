@@ -9,69 +9,122 @@ firebase.initializeApp(firebaseConfig);
 function App() {
   const [user, setUser] = useState({
     isSignedIn: false,
-    name : '',
+    name: '',
     email: '',
     photo: ''
   });
 
   const provider = new firebase.auth.GoogleAuthProvider();
-  const handleSignIn = () =>{
+  const handleSignIn = () => {
     firebase.auth().signInWithPopup(provider)
-    .then(res => {
-      const {displayName, photoURL, email} = res.user;
-      const signedInUser = {
-        isSignedIn : true,
-        name: displayName,
-        email: email,
-        photo: photoURL
-      }
-      setUser(signedInUser);
-      console.log(displayName,photoURL,email );
-    })
-    .catch(function(error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // The email of the user's account used.
-      var email = error.email;
-      // The firebase.auth.AuthCredential type that was used.
-      var credential = error.credential;
-    })
+      .then(res => {
+        const { displayName, photoURL, email } = res.user;
+        const signedInUser = {
+          isSignedIn: true,
+          name: displayName,
+          email: email,
+          photo: photoURL
+        }
+        setUser(signedInUser);
+        console.log(displayName, photoURL, email);
+      })
+      .catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+      })
   }
   const handleSignOut = () => {
     firebase.auth().signOut()
-    .then(res => {
+      .then(res => {
 
-      const signedOutUser = {
-        
-        isSignedIn: false,
-        name: '',
-        email: '',
-        photo: ''
-         }
-         setUser(signedOutUser);
-    })
-    .catch(err =>{
+        const signedOutUser = {
+
+          isSignedIn: false,
+          name: '',
+          email: '',
+          photo: '',
+          password: ''
+
+        }
+        setUser(signedOutUser);
+      })
+      .catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+      })
+  }
+  const handleBlur =(event) =>{
+    // console.log( event.target.name ,':', event.target.value);
+    let isFormValid = true;
 
 
-    })
+    if (event.target.name === 'email'){
+      isFormValid = /\S+@\S+\.\S+/.test(event.target.value);
+      // console.log(isEmailValid);
+
+    }
+    if(event.target.name === 'password'){
+
+      const isPasswordValid = event.target.value.length > 6;
+      const passwordHasNumber = /\d{1}/.test(event.target.value);
+      isFormValid =isPasswordValid && passwordHasNumber;
+    }
+    if(isFormValid){
+      const newUserInfo = {...user};
+      newUserInfo[event.target.name] = event.target.value;
+
+      setUser(newUserInfo);
+    }
+
+
+  }
+  const handleSubmit = () => {
+
   }
 
   return (
     <div className="App">
       {
         user.isSignedIn ? <button onClick={handleSignOut} > Sign out</button> :
-        <button onClick={handleSignIn} > Sign in</button>
+          <button onClick={handleSignIn} > Sign in</button>
       }
       {
-        user.isSignedIn && <div>  
-           <p>Welcome, {user.name}</p>
-           <p>Welcome, {user.email}</p>
-           <img src={user.photo} alt=""/>
+        user.isSignedIn && <div>
+          <p>Welcome, {user.name}</p>
+          <p>Welcome, {user.email}</p>
+          <img src={user.photo} alt="" />
 
         </div>
-        
+
       }
+
+      <h4> Our own Authentication system</h4>
+
+      <p>Name: {user.name} </p>
+      <p>Email: {user.email} </p>
+
+      <p>password: {user.password} </p>
+      <form onSubmit={handleSubmit}>
+
+        <input name="name" onBlur={handleBlur}  placeholder="Enter your name" type="text"/>
+        <br/>
+        <input type="text" onBlur={handleBlur} name="email" required placeholder="Write your email address" />
+        <br />
+        <input type="password" onBlur={handleBlur} name="password" required placeholder="Write your password" />
+        <br />
+
+        <input type="submit" value="Submit"/>
+      </form>
     </div>
   );
 }
